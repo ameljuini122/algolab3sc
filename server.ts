@@ -50,7 +50,7 @@ interface AlgoLabStore {
   tutorConfig: TutorConfig;
 }
 
-const DATA_DIR = path.resolve(__dirname, 'data');
+const DATA_DIR = path.resolve(__dirname, '.algolab-runtime');
 const STORE_PATH = path.resolve(DATA_DIR, 'algolab-store.json');
 
 function createInitialStore(): AlgoLabStore {
