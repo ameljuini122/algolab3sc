@@ -1,0 +1,881 @@
+MASTER PROMPT — BUILD AN INTERACTIVE AI-POWERED COMPUTER SCIENCE LEARNING PLATFORM
+1. YOUR ROLE
+Act as a senior multidisciplinary team composed of:
+
+A senior full-stack software engineer.
+A senior React, TypeScript and Firebase developer.
+A UX/UI designer specialized in educational platforms and EdTech.
+An expert computer science teacher specialized in secondary education.
+An expert in active learning, constructivist pedagogy and problem-based learning.
+An AI engineer specialized in educational AI tutors and adaptive learning.
+Your mission is to DESIGN AND BUILD a complete, functional, interactive, AI-powered educational web application based on the PDF document I have uploaded.
+
+Do not simply create a landing page or a static dashboard. Build a real educational application with working navigation, authentication, database integration, interactive exercises, code editors, AI assistance, student progress tracking and a teacher administration area.
+
+The application must be visually attractive, intuitive, responsive and pedagogically effective.
+
+2. PROJECT IDENTITY
+Application name: AlgoLab — Informatique 3SC
+
+Subtitle: Apprendre à raisonner, concevoir et programmer.
+
+Target audience: Students in 3ème année secondaire — Sciences expérimentales, Tunisia.
+
+Teacher: Amel Juini.
+
+Primary language: French.
+
+Additional requirement: Use clear, accessible French adapted to Tunisian secondary-school students. Keep algorithmic and Python terminology consistent with the source document.
+
+Educational philosophy:
+
+The application must not encourage students to memorize ready-made solutions.
+
+It must help them:
+
+Understand a problem before programming.
+Identify input data and expected outputs.
+Analyze a problem and break it into smaller tasks.
+Develop logical and algorithmic reasoning.
+Choose appropriate programming structures.
+Design algorithms independently.
+Translate algorithms into Python.
+Test, debug and improve their solutions.
+Learn from their mistakes.
+The central principle is:
+
+GUIDE THE STUDENT TOWARDS THE SOLUTION, NEVER GIVE THE SOLUTION IMMEDIATELY.
+
+3. MOST IMPORTANT REQUIREMENT: USE MY PDF AS THE MAIN EDUCATIONAL SOURCE
+The uploaded PDF is the official pedagogical reference for this application.
+
+It must be treated as the primary source of educational content.
+
+Content extraction
+Analyze the entire PDF, all 66 pages.
+Extract all chapters, lessons, definitions, examples, activities, projects, exercises, instructions, diagrams and tables.
+Use OCR or visual page inspection whenever text extraction is insufficient.
+Identify the document’s actual pedagogical organization.
+Organize the extracted content into chapters, lessons, activities and exercises.
+Preserve the original educational terminology, mathematical notation, algorithmic syntax and Python conventions.
+Keep the original exercise numbering and source page references.
+Do not omit exercises simply because their layout is difficult to interpret.
+Do not invent missing exercises or silently modify the teacher’s statements.
+If a page or exercise cannot be read correctly, flag it for teacher review instead of guessing.
+Important content rule
+Do not replace the teacher’s educational content with generic computer science tutorials.
+
+You may improve the presentation, explanations, interactive experience and pedagogical guidance, but preserve the original learning objectives and exercise requirements.
+
+For each exercise, create an additional pedagogical explanation entitled:
+
+« Comprendre le travail demandé »
+
+This explanation must:
+
+Explain what the student is expected to do.
+Clarify the objective of the exercise.
+Identify the skills being practiced.
+Explain difficult vocabulary where necessary.
+Help the student understand the problem statement.
+Suggest an approach to start thinking.
+It must NEVER contain the complete algorithm, final Python code or direct answer.
+
+4. APPLICATION ARCHITECTURE
+Build two separate interfaces sharing the same database.
+
+A. STUDENT INTERFACE
+A personalized learning environment where students can:
+
+Join a class using their name and a class/session code.
+Access the digital notebook.
+Browse chapters and lessons.
+Read explanations and examples.
+Complete interactive exercises.
+Write algorithms.
+Write and execute Python code.
+Ask the AI tutor for progressive hints.
+Submit answers.
+Receive feedback.
+Review their mistakes.
+Track their progress and achievements.
+B. TEACHER INTERFACE
+A secure administration dashboard accessible only to the teacher.
+
+The teacher must be able to:
+
+Create and manage classes.
+Create student sessions.
+Generate class access codes.
+View all registered students.
+View student submissions.
+Inspect answers and corrections.
+Monitor individual and class progress.
+Identify common mistakes.
+View exercises with the highest failure rates.
+Track students who need additional support.
+Manage chapters and lessons.
+Edit exercise statements and explanations.
+Create new exercises.
+Configure evaluation criteria.
+Manage AI tutor behavior.
+Export student results and reports.
+The teacher must have full control over the educational content.
+
+5. STUDENT LOGIN — KAHOOT-INSPIRED EXPERIENCE
+Create a very simple student joining experience inspired by Kahoot.
+
+Student entry screen
+Display:
+
+Application logo and name.
+Welcome message.
+Student name input.
+Class/session code input.
+Join button.
+Example:
+
+« Bienvenue dans AlgoLab ! »
+
+« Entre ton prénom et ton code de classe pour commencer ton apprentissage. »
+
+Students should not have to create complicated accounts or remember passwords for ordinary classroom activities.
+
+Use a unique student identifier behind the scenes so progress is not lost when the student reconnects.
+
+Session management
+The teacher generates a session code.
+Students join using that code.
+The teacher can see who joined.
+The teacher can activate or close a session.
+Student progress is saved and linked to the student identifier.
+Prevent duplicate or accidental student identities as far as possible.
+Do not expose student personal information publicly.
+
+Do not make student rankings or scores public by default.
+
+Teacher authentication must be completely separate and securely protected.
+
+6. DIGITAL NOTEBOOK — INTERACTIVE COURSE CONTENT
+Create a structured digital notebook based on the PDF.
+
+Navigation
+Organize the content into:
+
+Chapters.
+Lessons.
+Activities.
+Guided exercises.
+Application exercises.
+Projects.
+Assessments.
+Every lesson should have a clean, readable layout.
+
+Lesson experience
+Include:
+
+Lesson title.
+Learning objectives.
+Course content extracted from the PDF.
+Important definitions.
+Syntax examples.
+Interactive visual demonstrations where appropriate.
+Worked examples from the source document.
+A short comprehension activity.
+Related exercises.
+Add a progress indicator showing which lessons the student has completed.
+
+Use expandable sections, tabs, cards, interactive examples and visual explanations to avoid presenting long blocks of text.
+
+7. THE EXERCISE EXPERIENCE — THE HEART OF THE APPLICATION
+Every exercise in the PDF must become an interactive learning activity.
+
+Do not simply display the original statement and a blank text box.
+
+Create a complete pedagogical experience for every exercise.
+
+Exercise structure
+Every exercise must contain these sections:
+
+1. Original statement
+
+Display the original exercise statement, preserving its meaning and constraints.
+
+2. Comprendre le travail demandé
+
+Write an accessible explanation of what the student needs to accomplish.
+
+Do not provide the solution.
+
+3. Objectifs pédagogiques
+
+Display the skills being evaluated, for example:
+
+Analyse d’un problème.
+Identification des données.
+Détermination du résultat attendu.
+Choix d’une structure algorithmique.
+Utilisation des variables.
+Construction d’une condition.
+Gestion d’une boucle.
+Traduction en Python.
+Only show objectives relevant to the actual exercise.
+
+4. Méthode de réflexion
+
+Help the student organize their thinking through questions such as:
+
+Quelles sont les données disponibles ?
+Qu’est-ce qu’on cherche à obtenir ?
+Quelles variables sont nécessaires ?
+Quelles opérations doivent être effectuées ?
+Existe-t-il une répétition ?
+Quelle condition permet de prendre une décision ?
+Comment vérifier le résultat ?
+These questions should be adapted to each exercise.
+
+5. Espace de travail
+
+Create an interactive workspace adapted to the type of exercise.
+
+Possible formats:
+
+Text response.
+Short answer.
+Multiple choice.
+Fill in the blanks.
+Drag and drop.
+Algorithm editor.
+Python editor.
+Trace table.
+Variable table.
+Flowchart or structured representation.
+The student must be able to save a draft, modify the answer and submit it.
+
+6. AI Tutor
+
+Add an integrated AI tutor with contextual assistance.
+
+7. Vérifier ma réponse
+
+Allow the student to check their work.
+
+8. Feedback and improvement
+
+Display understandable feedback, errors and suggestions.
+
+9. Retry
+
+Allow the student to improve and resubmit their work.
+
+8. AI TUTOR — AN INTELLIGENT PEDAGOGICAL ASSISTANT
+This is one of the most important features.
+
+Integrate Gemini as an educational AI assistant.
+
+The AI must behave like an experienced computer science teacher, not like an answer generator.
+
+Core AI behavior
+When a student asks for help:
+
+Understand the exercise and its requirements.
+Analyze the student’s current attempt.
+Identify the exact difficulty.
+Ask a guiding question.
+Give a small hint.
+Wait for the student to think and respond.
+Give another hint if necessary.
+Explain the relevant concept.
+Encourage the student to try again.
+Progressive hint system
+Implement four assistance levels.
+
+Hint 1 — Orientation
+
+Help the student understand the problem.
+
+Example:
+« Commence par identifier les informations que le programme doit recevoir. »
+
+Hint 2 — Reasoning
+
+Guide the student’s reasoning.
+
+Example:
+« Réfléchis à la variable qui doit évoluer à chaque répétition. »
+
+Hint 3 — Conceptual guidance
+
+Explain the relevant programming concept without providing the completed solution.
+
+Example:
+« Une boucle Tant Que permet de répéter un bloc d’instructions tant qu’une condition de maintien est vraie. »
+
+Hint 4 — Targeted debugging
+
+Analyze the student’s attempt and point out the location or nature of the problem.
+
+Example:
+« Vérifie si ta variable compteur est mise à jour à chaque tour. »
+
+Never reveal the complete solution just because the student requests it.
+
+If a student repeatedly struggles, simplify the question, use a smaller example or propose a similar mini-exercise.
+
+AI tutor personality
+Friendly.
+Patient.
+Encouraging.
+Clear.
+Precise.
+Never humiliating.
+Adapted to secondary-school students.
+Avoid giving excessively long explanations.
+
+AI must understand the current context
+The AI must receive:
+
+Exercise statement.
+Original PDF reference.
+Exercise objectives.
+Teacher’s pedagogical explanation.
+Student’s current answer.
+Previous attempts.
+Previous hints.
+Relevant lesson content.
+It must not answer without considering the actual exercise.
+
+Special protection
+The AI must distinguish between:
+
+A correct answer.
+A partially correct answer.
+A syntactically incorrect answer.
+A logically incorrect answer.
+An incomplete answer.
+An answer that cannot be evaluated automatically.
+It must never claim an answer is correct without sufficient evidence.
+
+9. ALGORITHM IDE — INTERACTIVE ALGORITHM EDITOR
+For exercises requiring algorithm design, create a dedicated algorithm IDE.
+
+The interface should resemble a simplified educational programming environment.
+
+Features
+Syntax-highlighted algorithm editor.
+Monospaced font.
+Line numbers.
+Indentation support.
+Automatic indentation where possible.
+Clear and accessible editing experience.
+Save and submit buttons.
+Error highlighting.
+Basic algorithm syntax assistance.
+Support the algorithmic conventions used in the PDF, including:
+
+Début / Fin.
+Lire / Ecrire.
+Variables and assignments.
+Si / Alors / Sinon.
+Selon / Cas where present in the source.
+Pour.
+Tant Que / Faire.
+Répéter / Jusqu’à.
+Logical and comparison operators.
+Intelligent algorithm verification
+Check:
+
+Missing initialization.
+Incorrect conditions.
+Incorrect variable updates.
+Incorrect loop structure.
+Infinite-loop risks.
+Missing output.
+Inconsistent variable names.
+Incorrect logical sequence.
+Failure to respect the exercise constraints.
+Do not reject a logically correct algorithm simply because the student uses a different but valid formulation.
+
+Use teacher-defined expected criteria and AI-assisted semantic evaluation.
+
+Do not display a completed reference algorithm to the student during ordinary correction.
+
+10. PYTHON IDE — WRITE, RUN AND DEBUG
+For exercises requiring Python implementation, create a real interactive Python editor.
+
+Features
+Python syntax highlighting.
+Line numbers.
+Code indentation.
+Run button.
+Reset button.
+Output console.
+Input support.
+Error display.
+Save code.
+Submit code.
+Test cases.
+The student must be able to write and execute Python directly in the application.
+
+Use a safe, isolated execution environment. Consider Pyodide/WebAssembly for browser-based Python execution or a secure server-side sandbox.
+
+Never execute arbitrary student code directly on the application server without isolation and resource limits.
+
+Python correction
+Check:
+
+Syntax errors.
+Runtime errors.
+Incorrect conditions.
+Incorrect loops.
+Incorrect variable updates.
+Incorrect input/output.
+Incorrect algorithmic logic.
+Edge cases.
+Compliance with exercise constraints.
+Provide understandable feedback.
+
+Example:
+
+« Une erreur a été détectée à la ligne 5. Vérifie l’indentation du bloc while. »
+
+Do not automatically replace the student’s code with the correct version.
+
+11. INTERACTIVE TRACE TABLES AND VISUAL LEARNING
+For exercises involving execution traces, loops and variable evolution, create interactive trace tables.
+
+Students should be able to:
+
+Add execution steps.
+Fill variable values.
+Evaluate conditions.
+Follow loop iterations.
+Identify the stopping condition.
+Compare their trace with expected values after submission.
+Add a visual execution mode where the student can move step by step through an algorithm.
+
+Highlight:
+
+The current instruction.
+The variables being modified.
+The evaluated condition.
+The current iteration.
+This feature should make abstract algorithmic concepts easier to understand.
+
+12. ACTIVE LEARNING AND PEDAGOGICAL METHODOLOGY
+Do not design the application as a passive course-reading platform.
+
+Apply active-learning principles throughout the application.
+
+Learning cycle
+Use the following learning sequence:
+
+Discover a situation or problem.
+Observe and explore.
+Identify the problem.
+Formulate hypotheses.
+Analyze the information.
+Design an algorithm.
+Implement in Python.
+Test the solution.
+Analyze errors.
+Reflect on what was learned.
+Pedagogical activities
+Integrate appropriate interactive activities:
+
+Predict the output.
+Find the error.
+Complete the missing instruction.
+Reorder algorithmic instructions.
+Complete a trace table.
+Choose the appropriate condition.
+Identify variables.
+Compare two algorithms.
+Debug a Python program.
+Solve a problem independently.
+Use progressive difficulty:
+
+Découverte.
+Entraînement.
+Application.
+Défi.
+Do not add artificial activities that contradict the source material or curriculum.
+
+Learning through mistakes
+Mistakes should be treated as learning opportunities.
+
+The student should receive feedback explaining:
+
+What is incorrect.
+Why it is incorrect.
+Which concept should be reviewed.
+What to try next.
+Avoid displaying only a red cross or a numerical score.
+
+13. GAMIFICATION AND MOTIVATION
+Use light gamification inspired by modern educational applications.
+
+Add:
+
+XP points.
+Learning badges.
+Progress bars.
+Completed exercise indicators.
+Learning streaks.
+Achievement milestones.
+Optional classroom challenges.
+Examples of badges:
+
+Premier pas.
+Maître des variables.
+Expert des conditions.
+Explorateur des boucles.
+Détective des erreurs.
+Algorithmicien.
+Python Starter.
+Reward effort, improvement, persistence and successful reasoning, not only speed.
+
+Avoid excessive animations and competitive pressure.
+
+14. TEACHER DASHBOARD — COMPLETE BACK OFFICE
+Create a professional teacher interface with a secure administrator login.
+
+Dashboard overview
+Display:
+
+Number of students.
+Active classes.
+Exercises completed.
+Average class progress.
+Exercises with the highest failure rates.
+Students requiring support.
+Recent student submissions.
+Student management
+For every student, display:
+
+Name.
+Class.
+Progress percentage.
+Completed exercises.
+Success rate.
+Number of attempts.
+Hint usage.
+Last activity.
+Learning difficulties.
+Exercise analytics
+For each exercise, display:
+
+Number of students who attempted it.
+Number of successful submissions.
+Average number of attempts.
+Most frequent errors.
+Most frequently requested hints.
+Percentage of incomplete submissions.
+Individual student analysis
+Allow the teacher to inspect:
+
+Original answer.
+All previous attempts.
+Python code submitted.
+Algorithm submitted.
+AI feedback provided.
+Time and date of submissions.
+Skills mastered.
+Skills requiring reinforcement.
+Content management
+The teacher must be able to:
+
+Edit exercise statements.
+Edit pedagogical explanations.
+Add hints.
+Modify evaluation criteria.
+Change difficulty.
+Add test cases.
+Activate or deactivate exercises.
+Create new activities.
+Organize content by chapter.
+Teacher control over AI
+Allow the teacher to configure:
+
+AI assistance availability.
+Maximum hint levels.
+Whether hints are available before submission.
+Whether AI feedback is enabled.
+Whether a student can retry.
+Whether the solution is ever revealed after the activity is completed.
+The teacher should be able to review AI-generated hints before making them available to students.
+
+15. MODERN UI/UX DESIGN SYSTEM
+Create a beautiful, modern, friendly and professional educational interface.
+
+Design references:
+
+Duolingo.
+Khan Academy.
+Brilliant.
+Replit.
+Modern SaaS dashboards.
+Do not copy these products. Use them as inspiration.
+
+Visual identity
+Create a distinctive visual identity for AlgoLab.
+
+Recommended palette:
+
+Deep navy blue for structure and navigation.
+Electric blue for primary actions.
+Soft violet for AI features.
+Turquoise for learning and progress.
+Warm orange for challenges and highlights.
+Light neutral backgrounds for readability.
+Use:
+
+Rounded cards.
+Soft shadows.
+Clear typography.
+Consistent spacing.
+Modern icons.
+Progress indicators.
+Attractive empty states.
+Subtle transitions.
+Accessible contrast.
+Student experience
+The student interface should feel engaging and easy to navigate.
+
+Desktop layout:
+
+Left sidebar navigation.
+Main learning workspace.
+Optional contextual AI tutor panel.
+Mobile layout:
+
+Compact navigation.
+Responsive cards.
+Full-width exercise editor.
+Easy-to-use buttons.
+Accessible input fields.
+Teacher experience
+Use a more professional dashboard with:
+
+Sidebar navigation.
+Statistics cards.
+Tables.
+Charts.
+Filters.
+Student detail pages.
+Content management screens.
+Responsive requirements
+The application must work correctly on:
+
+Desktop.
+Laptop.
+Tablet.
+Smartphone.
+Use responsive layouts and test both portrait and landscape modes where relevant.
+
+Do not let code editors, tables or navigation overflow on small screens.
+
+16. TECHNICAL ARCHITECTURE
+Build a maintainable, scalable full-stack application.
+
+Recommended stack:
+
+Frontend
+
+React.
+TypeScript.
+Tailwind CSS.
+Modern reusable components.
+Lucide icons.
+Backend and database
+
+Firebase Authentication.
+Cloud Firestore.
+Firebase Storage for PDF and educational resources.
+Firebase Cloud Functions where needed.
+AI
+
+Gemini API.
+Server-side AI calls.
+Contextual prompts for the AI tutor.
+Structured outputs for correction and feedback.
+Python execution
+
+Pyodide/WebAssembly or an isolated execution service.
+Deployment
+
+Firebase Hosting or another suitable production hosting platform.
+Security
+Keep Gemini API keys on the server.
+Never expose private credentials in frontend code.
+Implement Firebase security rules.
+Separate teacher and student permissions.
+Protect student data.
+Validate all submitted data.
+Apply rate limits to AI requests.
+Restrict code execution resources.
+Prevent students from accessing teacher-only routes.
+Database structure
+Design suitable collections for:
+
+users
+students
+teachers
+classes
+sessions
+chapters
+lessons
+exercises
+submissions
+attempts
+hints
+feedback
+achievements
+progress
+testCases
+Use stable IDs and relationships between records.
+
+Store timestamps and student progress persistently.
+
+Do not use localStorage as the only database for student work.
+
+17. EVALUATION AND FEEDBACK SYSTEM
+Create an intelligent evaluation system adapted to the type of answer.
+
+Closed questions
+Automatically correct:
+
+Multiple choice.
+True/false.
+Matching.
+Fill in the blanks.
+Algorithm exercises
+Evaluate using:
+
+Teacher-defined criteria.
+Logical correctness.
+Required instructions.
+Variables.
+Conditions.
+Loops.
+Initialization and updates.
+Expected outputs.
+Python exercises
+Evaluate using:
+
+Syntax.
+Execution.
+Test cases.
+Expected results.
+Logical correctness.
+Edge cases.
+Open-ended answers
+Use semantic AI evaluation, but allow the teacher to review and override the assessment.
+
+Feedback format
+For every submitted answer, show:
+
+What is correct.
+What needs improvement.
+Explanation of the error.
+A progressive hint.
+Recommended lesson to review.
+Do not rely exclusively on AI to assign definitive grades.
+
+Keep the teacher as the final authority.
+
+18. IMPORTANT FUNCTIONAL REQUIREMENTS
+The following requirements are mandatory:
+
+Every navigation item must work.
+Every button must have a real action.
+Every exercise must have a functional response area.
+Student answers must be saved.
+Students must be able to resume their work.
+AI assistance must be contextual.
+Python code must be executable in a safe environment.
+Algorithm answers must be editable.
+Teacher data must be accessible only to authorized teachers.
+Dashboard statistics must come from actual stored data.
+The application must not rely on fake hardcoded statistics.
+Empty states and error states must be handled properly.
+Add loading indicators where necessary.
+Provide clear success and error messages.
+Do not build decorative components that look functional but do nothing.
+
+If a feature requires external configuration, implement the interface and explain exactly what credentials or configuration are needed.
+
+19. DEVELOPMENT STRATEGY
+Develop the project progressively.
+
+Phase 1 — PDF analysis and content architecture
+Analyze all 66 pages.
+Extract the complete educational structure.
+Create a structured content database.
+Identify every exercise and its expected answer format.
+Flag unclear pages for teacher verification.
+Phase 2 — Application foundation
+Create the visual design system.
+Implement navigation.
+Implement student entry.
+Implement secure teacher authentication.
+Connect Firebase.
+Phase 3 — Digital notebook
+Import lessons.
+Import activities.
+Import all exercises.
+Add pedagogical explanations.
+Add source page references.
+Phase 4 — Interactive exercise engine
+Build answer areas.
+Build algorithm editor.
+Build Python editor.
+Build trace tables.
+Implement correction and feedback.
+Phase 5 — AI tutor
+Integrate Gemini.
+Implement progressive hints.
+Implement contextual exercise analysis.
+Implement mistake diagnosis.
+Prevent direct solution disclosure.
+Phase 6 — Teacher dashboard
+Student management.
+Submission tracking.
+Analytics.
+Content management.
+AI configuration.
+Phase 7 — Testing and optimization
+Test:
+
+Student login.
+Teacher login.
+Database persistence.
+Exercise submissions.
+Algorithm evaluation.
+Python execution.
+AI assistance.
+Responsive behavior.
+Security and access permissions.
+20. FINAL EXECUTION INSTRUCTIONS
+Now start building the actual application.
+
+Do not respond with a theoretical project proposal, a list of recommendations or a static mockup.
+
+I want the application itself to be implemented.
+
+Start by analyzing the uploaded PDF, then create the application architecture and implement the working interfaces.
+
+Prioritize a fully functional core experience over decorative features.
+
+If the complete application cannot be implemented in one generation, build it in clearly defined, working phases. Preserve the architecture and existing functionality between phases.
+
+Do not delete or replace working features when adding new ones.
+
+At every stage:
+
+Explain what has been implemented.
+Identify what is functional.
+Identify what still requires configuration.
+Never claim that a backend, database, authentication system or code execution engine is working unless it has actually been implemented and tested.
+The final result must be a real, usable AI-powered educational platform that transforms my computer science notebook into an interactive learning experience and helps students become independent problem solvers.
+

@@ -1,0 +1,145 @@
+{
+  "entities": {
+    "Admin": {
+      "title": "Admin",
+      "description": "Authorized teacher administrator account.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "email": { "type": "string", "minLength": 3, "maxLength": 160 },
+        "displayName": { "type": "string", "minLength": 1, "maxLength": 100 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["uid", "email", "displayName", "createdAt"]
+    },
+    "ClassRoom": {
+      "title": "ClassRoom",
+      "description": "Classroom group managed by the teacher.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 80 },
+        "level": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "schoolYear": { "type": "string", "minLength": 4, "maxLength": 20 },
+        "teacherUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "level", "schoolYear", "teacherUid", "createdAt", "updatedAt"]
+    },
+    "Session": {
+      "title": "Session",
+      "description": "Classroom learning session with a Kahoot-style join code.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "classId": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "title": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "code": { "type": "string", "minLength": 4, "maxLength": 16, "pattern": "^[A-Z0-9]+$" },
+        "active": { "type": "boolean" },
+        "teacherUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "classId", "title", "code", "active", "teacherUid", "createdAt", "updatedAt"]
+    },
+    "StudentProfile": {
+      "title": "StudentProfile",
+      "description": "Student record created upon joining a session.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "name": { "type": "string", "minLength": 2, "maxLength": 60 },
+        "classId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "sessionId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "xp": { "type": "number" },
+        "streak": { "type": "number" },
+        "teacherUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "name", "classId", "sessionId", "xp", "streak", "teacherUid", "createdAt", "updatedAt"]
+    },
+    "ExerciseOverride": {
+      "title": "ExerciseOverride",
+      "description": "Teacher-edited or newly created exercise metadata and criteria.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "chapterId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "title": { "type": "string", "minLength": 2, "maxLength": 160 },
+        "statement": { "type": "string", "minLength": 5, "maxLength": 5000 },
+        "understandWork": { "type": "string", "minLength": 5, "maxLength": 3000 },
+        "difficulty": { "type": "string", "enum": ["Découverte", "Entraînement", "Application", "Défi"] },
+        "active": { "type": "boolean" },
+        "teacherUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "chapterId", "title", "statement", "understandWork", "difficulty", "active", "teacherUid", "updatedAt"]
+    },
+    "Submission": {
+      "title": "Submission",
+      "description": "Student exercise submission and evaluation result.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128, "pattern": "^[a-zA-Z0-9_\\-]+$" },
+        "studentId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "exerciseId": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "status": { "type": "string", "enum": ["correct", "partial", "incorrect", "pending_review"] },
+        "attemptsCount": { "type": "number" },
+        "hintsUsed": { "type": "number" },
+        "teacherUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "studentId", "exerciseId", "status", "attemptsCount", "hintsUsed", "teacherUid", "createdAt", "updatedAt"]
+    },
+    "TutorConfig": {
+      "title": "TutorConfig",
+      "description": "Teacher settings controlling AI Tutor behavior and hint policies.",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "aiEnabled": { "type": "boolean" },
+        "maxHintLevel": { "type": "number" },
+        "hintsBeforeSubmission": { "type": "boolean" },
+        "aiFeedbackEnabled": { "type": "boolean" },
+        "allowRetry": { "type": "boolean" },
+        "revealSolutionAfterCompletion": { "type": "boolean" },
+        "teacherUid": { "type": "string", "minLength": 1, "maxLength": 128 },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "aiEnabled", "maxHintLevel", "hintsBeforeSubmission", "aiFeedbackEnabled", "allowRetry", "revealSolutionAfterCompletion", "teacherUid", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/admins/{uid}": {
+      "schema": { "$ref": "#/entities/Admin" },
+      "description": "Authorized teacher administrator profiles."
+    },
+    "/classes/{classId}": {
+      "schema": { "$ref": "#/entities/ClassRoom" },
+      "description": "Teacher-managed class groups."
+    },
+    "/sessions/{sessionId}": {
+      "schema": { "$ref": "#/entities/Session" },
+      "description": "Teacher-managed classroom sessions with access codes."
+    },
+    "/students/{studentId}": {
+      "schema": { "$ref": "#/entities/StudentProfile" },
+      "description": "Enrolled student progress records managed by the teacher."
+    },
+    "/exerciseOverrides/{exerciseId}": {
+      "schema": { "$ref": "#/entities/ExerciseOverride" },
+      "description": "Teacher customizations and newly authored exercises."
+    },
+    "/submissions/{submissionId}": {
+      "schema": { "$ref": "#/entities/Submission" },
+      "description": "Student exercise submissions and teacher overrides."
+    },
+    "/settings/{settingId}": {
+      "schema": { "$ref": "#/entities/TutorConfig" },
+      "description": "AI Tutor and pedagogical policy configuration."
+    }
+  }
+}

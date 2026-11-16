@@ -1,0 +1,262 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: default deny
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerified() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isBootstrappedTeacher() {
+      return isVerified() && request.auth.token.email == 'amelijuini3@gmail.com';
+    }
+
+    function isTeacherAdmin() {
+      return isBootstrappedTeacher() || (isVerified() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)));
+    }
+
+    function isValidAdmin(data) {
+      return data.keys().hasAll(['uid', 'email', 'displayName', 'createdAt'])
+        && data.keys().hasOnly(['uid', 'email', 'displayName', 'createdAt'])
+        && isValidId(data.uid)
+        && data.uid == request.auth.uid
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 160
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100
+        && data.createdAt is timestamp;
+    }
+
+    function isValidClassRoom(data) {
+      return data.keys().hasAll(['id', 'name', 'level', 'schoolYear', 'teacherUid', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'name', 'level', 'schoolYear', 'teacherUid', 'createdAt', 'updatedAt'])
+        && isValidId(data.id)
+        && data.name is string && data.name.size() >= 2 && data.name.size() <= 80
+        && data.level is string && data.level.size() >= 2 && data.level.size() <= 60
+        && data.schoolYear is string && data.schoolYear.size() >= 4 && data.schoolYear.size() <= 20
+        && isValidId(data.teacherUid)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidSession(data) {
+      return data.keys().hasAll(['id', 'classId', 'title', 'code', 'active', 'teacherUid', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'classId', 'title', 'code', 'active', 'teacherUid', 'createdAt', 'updatedAt'])
+        && isValidId(data.id)
+        && isValidId(data.classId)
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 100
+        && data.code is string && data.code.size() >= 4 && data.code.size() <= 16 && data.code.matches('^[A-Z0-9]+$')
+        && data.active is bool
+        && isValidId(data.teacherUid)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidStudentProfile(data) {
+      return data.keys().hasAll(['id', 'name', 'classId', 'sessionId', 'xp', 'streak', 'teacherUid', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'name', 'classId', 'sessionId', 'xp', 'streak', 'teacherUid', 'createdAt', 'updatedAt'])
+        && isValidId(data.id)
+        && data.name is string && data.name.size() >= 2 && data.name.size() <= 60
+        && isValidId(data.classId)
+        && isValidId(data.sessionId)
+        && data.xp is number && data.xp >= 0 && data.xp <= 1000000
+        && data.streak is number && data.streak >= 0 && data.streak <= 10000
+        && isValidId(data.teacherUid)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidExerciseOverride(data) {
+      return data.keys().hasAll(['id', 'chapterId', 'title', 'statement', 'understandWork', 'difficulty', 'active', 'teacherUid', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'chapterId', 'title', 'statement', 'understandWork', 'difficulty', 'active', 'teacherUid', 'updatedAt'])
+        && isValidId(data.id)
+        && isValidId(data.chapterId)
+        && data.title is string && data.title.size() >= 2 && data.title.size() <= 160
+        && data.statement is string && data.statement.size() >= 5 && data.statement.size() <= 5000
+        && data.understandWork is string && data.understandWork.size() >= 5 && data.understandWork.size() <= 3000
+        && data.difficulty in ['Découverte', 'Entraînement', 'Application', 'Défi']
+        && data.active is bool
+        && isValidId(data.teacherUid)
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidSubmission(data) {
+      return data.keys().hasAll(['id', 'studentId', 'exerciseId', 'status', 'attemptsCount', 'hintsUsed', 'teacherUid', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'studentId', 'exerciseId', 'status', 'attemptsCount', 'hintsUsed', 'teacherUid', 'createdAt', 'updatedAt'])
+        && isValidId(data.id)
+        && isValidId(data.studentId)
+        && isValidId(data.exerciseId)
+        && data.status in ['correct', 'partial', 'incorrect', 'pending_review']
+        && data.attemptsCount is number && data.attemptsCount >= 1 && data.attemptsCount <= 1000
+        && data.hintsUsed is number && data.hintsUsed >= 0 && data.hintsUsed <= 100
+        && isValidId(data.teacherUid)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidTutorConfig(data) {
+      return data.keys().hasAll(['id', 'aiEnabled', 'maxHintLevel', 'hintsBeforeSubmission', 'aiFeedbackEnabled', 'allowRetry', 'revealSolutionAfterCompletion', 'teacherUid', 'updatedAt'])
+        && data.keys().hasOnly(['id', 'aiEnabled', 'maxHintLevel', 'hintsBeforeSubmission', 'aiFeedbackEnabled', 'allowRetry', 'revealSolutionAfterCompletion', 'teacherUid', 'updatedAt'])
+        && isValidId(data.id)
+        && data.aiEnabled is bool
+        && data.maxHintLevel is number && data.maxHintLevel >= 1 && data.maxHintLevel <= 4
+        && data.hintsBeforeSubmission is bool
+        && data.aiFeedbackEnabled is bool
+        && data.allowRetry is bool
+        && data.revealSolutionAfterCompletion is bool
+        && isValidId(data.teacherUid)
+        && data.updatedAt is timestamp;
+    }
+
+    // Boot connection check document (read-only ping)
+    match /test/connection {
+      allow get: if true;
+    }
+
+    match /admins/{uid} {
+      allow get: if isValidId(uid) && isTeacherAdmin() && request.auth.uid == uid;
+      allow list: if false;
+      allow create: if isValidId(uid) && isBootstrappedTeacher() && request.auth.uid == uid
+        && isValidAdmin(incoming()) && incoming().createdAt == request.time;
+      allow update, delete: if false;
+    }
+
+    match /classes/{classId} {
+      allow get: if isValidId(classId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+      allow list: if isTeacherAdmin() && resource.data.teacherUid == request.auth.uid;
+      allow create: if isValidId(classId) && isTeacherAdmin()
+        && isValidClassRoom(incoming())
+        && incoming().id == classId
+        && incoming().teacherUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(classId) && isTeacherAdmin()
+        && isValidClassRoom(incoming())
+        && existing().teacherUid == request.auth.uid
+        && incoming().teacherUid == existing().teacherUid
+        && incoming().id == existing().id
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'level', 'schoolYear', 'updatedAt']);
+      allow delete: if isValidId(classId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+    }
+
+    match /sessions/{sessionId} {
+      allow get: if isValidId(sessionId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+      allow list: if isTeacherAdmin() && resource.data.teacherUid == request.auth.uid;
+      allow create: if isValidId(sessionId) && isTeacherAdmin()
+        && isValidSession(incoming())
+        && incoming().id == sessionId
+        && incoming().teacherUid == request.auth.uid
+        && exists(/databases/$(database)/documents/classes/$(incoming().classId))
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(sessionId) && isTeacherAdmin()
+        && isValidSession(incoming())
+        && existing().teacherUid == request.auth.uid
+        && incoming().teacherUid == existing().teacherUid
+        && incoming().id == existing().id
+        && incoming().classId == existing().classId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['title', 'code', 'active', 'updatedAt']);
+      allow delete: if isValidId(sessionId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+    }
+
+    match /students/{studentId} {
+      allow get: if isValidId(studentId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+      allow list: if isTeacherAdmin() && resource.data.teacherUid == request.auth.uid;
+      allow create: if isValidId(studentId) && isTeacherAdmin()
+        && isValidStudentProfile(incoming())
+        && incoming().id == studentId
+        && incoming().teacherUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(studentId) && isTeacherAdmin()
+        && isValidStudentProfile(incoming())
+        && existing().teacherUid == request.auth.uid
+        && incoming().teacherUid == existing().teacherUid
+        && incoming().id == existing().id
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['name', 'classId', 'sessionId', 'xp', 'streak', 'updatedAt']);
+      allow delete: if isValidId(studentId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+    }
+
+    match /exerciseOverrides/{exerciseId} {
+      allow get: if isValidId(exerciseId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+      allow list: if isTeacherAdmin() && resource.data.teacherUid == request.auth.uid;
+      allow create: if isValidId(exerciseId) && isTeacherAdmin()
+        && isValidExerciseOverride(incoming())
+        && incoming().id == exerciseId
+        && incoming().teacherUid == request.auth.uid
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(exerciseId) && isTeacherAdmin()
+        && isValidExerciseOverride(incoming())
+        && existing().teacherUid == request.auth.uid
+        && incoming().teacherUid == existing().teacherUid
+        && incoming().id == existing().id
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['chapterId', 'title', 'statement', 'understandWork', 'difficulty', 'active', 'updatedAt']);
+      allow delete: if isValidId(exerciseId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+    }
+
+    match /submissions/{submissionId} {
+      allow get: if isValidId(submissionId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+      allow list: if isTeacherAdmin() && resource.data.teacherUid == request.auth.uid;
+      allow create: if isValidId(submissionId) && isTeacherAdmin()
+        && isValidSubmission(incoming())
+        && incoming().id == submissionId
+        && incoming().teacherUid == request.auth.uid
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(submissionId) && isTeacherAdmin()
+        && isValidSubmission(incoming())
+        && existing().teacherUid == request.auth.uid
+        && incoming().teacherUid == existing().teacherUid
+        && incoming().id == existing().id
+        && incoming().studentId == existing().studentId
+        && incoming().exerciseId == existing().exerciseId
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['status', 'attemptsCount', 'hintsUsed', 'updatedAt']);
+      allow delete: if isValidId(submissionId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+    }
+
+    match /settings/{settingId} {
+      allow get: if isValidId(settingId) && isTeacherAdmin() && existing().teacherUid == request.auth.uid;
+      allow list: if isTeacherAdmin() && resource.data.teacherUid == request.auth.uid;
+      allow create: if isValidId(settingId) && isTeacherAdmin()
+        && isValidTutorConfig(incoming())
+        && incoming().id == settingId
+        && incoming().teacherUid == request.auth.uid
+        && incoming().updatedAt == request.time;
+      allow update: if isValidId(settingId) && isTeacherAdmin()
+        && isValidTutorConfig(incoming())
+        && existing().teacherUid == request.auth.uid
+        && incoming().teacherUid == existing().teacherUid
+        && incoming().id == existing().id
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['aiEnabled', 'maxHintLevel', 'hintsBeforeSubmission', 'aiFeedbackEnabled', 'allowRetry', 'revealSolutionAfterCompletion', 'updatedAt']);
+      allow delete: if false;
+    }
+  }
+}

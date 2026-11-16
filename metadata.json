@@ -1,0 +1,6 @@
+{
+  "name": "AlgoLab — Informatique 3SC",
+  "description": "Plateforme éducative interactive et intelligente d'algorithmique et Python pour la 3ème année Sciences Expérimentales (Lycée Mongi Slim Siliana).",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
