@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Lightbulb, Send, MessageSquare, Lock } from 'lucide-react';
 import type { Exercise, HintRecord } from '../types/algolab';
+import { apiRequestAiTutorHint } from '../utils/apiClient';
 
 interface AiTutorPanelProps {
   studentId: string;
@@ -44,27 +45,20 @@ export const AiTutorPanel: React.FC<AiTutorPanelProps> = ({
     setError('');
     setLoading(true);
     try {
-      const resp = await fetch('/api/ai/tutor', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          studentId,
-          exerciseId: exercise.id,
-          level: lvl,
-          question: customQuestion?.trim() || undefined,
-          currentAttempt,
-          previousHints: hintsHistory.map((h) => h.hintText),
-        }),
+      const res = await apiRequestAiTutorHint({
+        studentId,
+        exerciseId: exercise.id,
+        level: lvl,
+        question: customQuestion?.trim() || undefined,
+        currentAttempt,
+        previousHints: hintsHistory.map((h) => h.hintText),
       });
-      const data = await resp.json();
-      if (!resp.ok) {
-        setError(data.error || 'Impossible de contacter le Tuteur IA.');
+      if (!res.ok) {
+        setError(res.error || 'Impossible de contacter le Tuteur IA.');
         return;
       }
-      if (data.hint) {
-        onHintReceived(data.hint);
-        if (customQuestion) setQuestion('');
-      }
+      onHintReceived(res.hint);
+      if (customQuestion) setQuestion('');
     } catch {
       setError('Connexion au Tuteur IA indisponible pour le moment.');
     } finally {

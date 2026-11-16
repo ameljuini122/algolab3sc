@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ArrowRight, BookOpen, Code2, GraduationCap, ShieldCheck } from 'lucide-react';
+import { apiJoinStudent } from '../utils/apiClient';
 
 interface StudentJoinViewProps {
   onJoined: (data: {
@@ -37,19 +38,14 @@ export const StudentJoinView: React.FC<StudentJoinViewProps> = ({
 
     setLoading(true);
     try {
-      const resp = await fetch('/api/student/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: cleanName, code: cleanCode }),
-      });
-      const data = await resp.json();
-      if (!resp.ok) {
-        setError(data.error || 'Impossible de rejoindre la séance.');
+      const res = await apiJoinStudent(cleanName, cleanCode);
+      if (!res.ok) {
+        setError(res.error || 'Impossible de rejoindre la séance.');
         return;
       }
-      onJoined(data);
+      onJoined(res.data);
     } catch {
-      setError('Erreur de connexion au serveur. Réessaie dans un instant.');
+      setError('Erreur de connexion. Réessaie dans un instant.');
     } finally {
       setLoading(false);
     }

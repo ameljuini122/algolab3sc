@@ -32,6 +32,17 @@ import type {
   StudentSubmission,
   TutorConfig,
 } from '../types/algolab';
+import {
+  apiTeacherCreateClass,
+  apiTeacherCreateExercise,
+  apiTeacherCreateSession,
+  apiTeacherExportBlob,
+  apiTeacherOverview,
+  apiTeacherOverrideSubmission,
+  apiTeacherToggleSession,
+  apiTeacherUpdateAiConfig,
+  apiTeacherUpdateExercise,
+} from '../utils/apiClient';
 
 interface TeacherPortalProps {
   chapters: Chapter[];
@@ -132,30 +143,17 @@ export const TeacherPortal: React.FC<TeacherPortalProps> = ({
     Boolean(fbUser?.emailVerified) &&
     fbUser?.email?.toLowerCase() === AUTHORIZED_TEACHER_EMAIL;
 
-  const authedFetch = async (url: string, options?: RequestInit) => {
-    const token = await auth.currentUser?.getIdToken();
-    if (!token) throw new Error('Jeton Google manquant');
-    return fetch(url, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-        ...(options?.headers || {}),
-      },
-    });
-  };
-
   const loadOverview = async () => {
     if (!isAuthorized) return;
     setLoadingData(true);
     setActionError('');
     try {
-      const resp = await authedFetch('/api/teacher/overview');
-      const data = await resp.json();
-      if (!resp.ok) {
-        setActionError(data.error || 'Impossible de charger les données enseignant.');
+      const res = await apiTeacherOverview();
+      if (!res.ok) {
+        setActionError(res.error || 'Impossible de charger les données enseignant.');
         return;
       }
+      const data = res.data;
       setOverview(data);
       if (data.classes?.[0] && !newSessClassId) {
         setNewSessClassId(data.classes[0].id);
@@ -200,17 +198,13 @@ export const TeacherPortal: React.FC<TeacherPortalProps> = ({
     e.preventDefault();
     if (!newClassName.trim()) return;
     setActionError('');
-    const resp = await authedFetch('/api/teacher/classes', {
-      method: 'POST',
-      body: JSON.stringify({ name: newClassName.trim() }),
-    });
-    if (resp.ok) {
+    const res = await apiTeacherCreateClass(newClassName.trim());
+    if (res.ok) {
       setNewClassName('');
       setActionSuccess('Classe créée avec succès.');
       await loadOverview();
     } else {
-      const d = await resp.json();
-      setActionError(d.error || 'Erreur création classe.');
+      setActionError(res.error || 'Erreur création classe.');
     }
   };
 
@@ -218,31 +212,24 @@ export const TeacherPortal: React.FC<TeacherPortalProps> = ({
     e.preventDefault();
     if (!newSessTitle.trim()) return;
     setActionError('');
-    const resp = await authedFetch('/api/teacher/sessions', {
-      method: 'POST',
-      body: JSON.stringify({
-        classId: newSessClassId || overview?.classes[0]?.id,
-        title: newSessTitle.trim(),
-        code: newSessCode.trim(),
-      }),
+    const res = await apiTeacherCreateSession({
+      classId: newSessClassId || overview?.classes[0]?.id || '',
+      title: newSessTitle.trim(),
+      code: newSessCode.trim(),
     });
-    if (resp.ok) {
+    if (res.ok) {
       setNewSessTitle('');
       setNewSessCode('');
       setActionSuccess('Séance créée et activée.');
       await loadOverview();
     } else {
-      const d = await resp.json();
-      setActionError(d.error || 'Erreur création séance.');
+      setActionError(res.error || 'Erreur création séance.');
     }
   };
 
   const handleToggleSession = async (sess: Session) => {
-    const resp = await authedFetch(`/api/teacher/sessions/${sess.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({ active: !sess.active }),
-    });
-    if (resp.ok) {
+    const res = await apiTeacherToggleSession(sess);
+    if (res.ok) {
       await loadOverview();
     }
   };
@@ -250,15 +237,12 @@ export const TeacherPortal: React.FC<TeacherPortalProps> = ({
   const handleSaveOverride = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!overrideSub) return;
-    const resp = await authedFetch(`/api/teacher/submissions/${overrideSub.id}/override`, {
-      method: 'POST',
-      body: JSON.stringify({
-        status: overrideStatus,
-        scorePercent: overrideScore,
-        teacherOverrideNote: overrideNote,
-      }),
+    const res = await apiTeacherOverrideSubmission(overrideSub.id, {
+      status: overrideStatus,
+      scorePercent: overrideScore,
+      teacherOverrideNote: overrideNote,
     });
-    if (resp.ok) {
+    if (res.ok) {
       setOverrideSub(null);
       setActionSuccess('Évaluation mise à jour par l’enseignante.');
       await loadOverview();
@@ -268,20 +252,17 @@ export const TeacherPortal: React.FC<TeacherPortalProps> = ({
   const handleSaveExerciseEdit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingExercise) return;
-    const resp = await authedFetch(`/api/teacher/exercises/${editingExercise.id}`, {
-      method: 'PATCH',
-      body: JSON.stringify({
-        title: editingExercise.title,
-        originalStatement: editingExercise.originalStatement,
-        understandWork: editingExercise.understandWork,
-        difficulty: editingExercise.difficulty,
-        active: editingExercise.active,
-        presetHints: editingExercise.presetHints,
-        needsTeacherReview: editingExercise.needsTeacherReview,
-        reviewNote: editingExercise.reviewNote,
-      }),
+    const res = await apiTeacherUpdateExercise(editingExercise.id, {
+      title: editingExercise.title,
+      originalStatement: editingExercise.originalStatement,
+      understandWork: editingExercise.understandWork,
+      difficulty: editingExercise.difficulty,
+      active: editingExercise.active,
+      presetHints: editingExercise.presetHints,
+      needsTeacherReview: editingExercise.needsTeacherReview,
+      reviewNote: editingExercise.reviewNote,
     });
-    if (resp.ok) {
+    if (res.ok) {
       setEditingExercise(null);
       setActionSuccess('Exercice mis à jour dans le programme.');
       await onCurriculumUpdated();
@@ -291,16 +272,13 @@ export const TeacherPortal: React.FC<TeacherPortalProps> = ({
 
   const handleCreateExercise = async (e: React.FormEvent) => {
     e.preventDefault();
-    const resp = await authedFetch('/api/teacher/exercises', {
-      method: 'POST',
-      body: JSON.stringify({
-        title: newExTitle,
-        chapterId: newExChapter,
-        originalStatement: newExStatement,
-        understandWork: newExUnderstand,
-      }),
+    const res = await apiTeacherCreateExercise({
+      title: newExTitle,
+      chapterId: newExChapter,
+      originalStatement: newExStatement,
+      understandWork: newExUnderstand,
     });
-    if (resp.ok) {
+    if (res.ok) {
       setShowCreateExercise(false);
       setNewExTitle('');
       setNewExStatement('');
@@ -312,11 +290,8 @@ export const TeacherPortal: React.FC<TeacherPortalProps> = ({
   };
 
   const handleUpdateAiConfig = async (patch: Record<string, unknown>) => {
-    const resp = await authedFetch('/api/teacher/ai-config', {
-      method: 'PATCH',
-      body: JSON.stringify(patch),
-    });
-    if (resp.ok) {
+    const res = await apiTeacherUpdateAiConfig(patch);
+    if (res.ok) {
       setActionSuccess('Configuration du Tuteur IA enregistrée.');
       await onCurriculumUpdated();
       await loadOverview();
@@ -325,9 +300,8 @@ export const TeacherPortal: React.FC<TeacherPortalProps> = ({
 
   const handleExport = async (format: 'csv' | 'json') => {
     try {
-      const resp = await authedFetch(`/api/teacher/export?format=${format}`);
-      if (!resp.ok) return;
-      const blob = await resp.blob();
+      const blob = await apiTeacherExportBlob(format);
+      if (!blob) return;
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;

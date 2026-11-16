@@ -23,6 +23,7 @@ import type {
 } from '../types/algolab';
 import { DigitalNotebook } from './DigitalNotebook';
 import { ExerciseWorkspace } from './ExerciseWorkspace';
+import { apiUpdateLessonProgress } from '../utils/apiClient';
 
 interface StudentShellProps {
   student: StudentProfile;
@@ -119,15 +120,8 @@ export const StudentShell: React.FC<StudentShellProps> = ({
   }, [allExercises, exFilterChapter, exFilterStatus, exSearch, student.completedExercises, submissionByEx]);
 
   const handleToggleLessonComplete = async (lessonId: string, completed: boolean) => {
-    const resp = await fetch('/api/student/lesson-progress', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ studentId: student.id, lessonId, completed }),
-    });
-    if (resp.ok) {
-      const data = await resp.json();
-      if (data.student) onUpdateStudent(data.student);
-    }
+    const updated = await apiUpdateLessonProgress(student.id, lessonId, completed);
+    if (updated) onUpdateStudent(updated);
   };
 
   const handleOpenExercise = (exerciseId: string) => {

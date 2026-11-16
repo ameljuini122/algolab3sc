@@ -21,6 +21,7 @@ import type { PythonExecutionOutcome } from '../utils/evaluators';
 import { AlgorithmIDE } from './AlgorithmIDE';
 import { PythonIDE } from './PythonIDE';
 import { AiTutorPanel } from './AiTutorPanel';
+import { apiSaveDraft, apiSubmitExercise } from '../utils/apiClient';
 
 interface ExerciseWorkspaceProps {
   studentId: string;
@@ -111,16 +112,8 @@ export const ExerciseWorkspace: React.FC<ExerciseWorkspaceProps> = ({
     setSavingDraft(true);
     setDraftMessage('');
     try {
-      const resp = await fetch('/api/student/draft', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          studentId,
-          exerciseId: exercise.id,
-          answerPayload: payload,
-        }),
-      });
-      if (resp.ok) {
+      const ok = await apiSaveDraft(studentId, exercise.id, payload);
+      if (ok) {
         setDraftMessage('Brouillon enregistré');
         setTimeout(() => setDraftMessage(''), 2500);
       }
@@ -133,24 +126,19 @@ export const ExerciseWorkspace: React.FC<ExerciseWorkspaceProps> = ({
     setSubmitting(true);
     setSubmitError('');
     try {
-      const resp = await fetch('/api/student/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          studentId,
-          exerciseId: exercise.id,
-          answerPayload: payload,
-          pythonOutcome: pyOutcome,
-          hintsRequested: exerciseHints.length,
-        }),
+      const res = await apiSubmitExercise({
+        studentId,
+        exerciseId: exercise.id,
+        answerPayload: payload,
+        pythonOutcome: pyOutcome,
+        hintsRequested: exerciseHints.length,
       });
-      const data = await resp.json();
-      if (!resp.ok) {
-        setSubmitError(data.error || 'Erreur lors de l’évaluation.');
+      if (!res.ok) {
+        setSubmitError(res.error || 'Erreur lors de l’évaluation.');
         return;
       }
-      setFeedback(data.feedback);
-      onSubmitted(data);
+      setFeedback(res.data.feedback);
+      onSubmitted(res.data);
     } catch {
       setSubmitError('Impossible de vérifier la réponse pour le moment.');
     } finally {

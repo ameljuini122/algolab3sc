@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { testFirestoreConnection } from './firebase';
 import { CURRICULUM_CHAPTERS, BADGE_DEFINITIONS } from './data/curriculum';
+import {
+  apiFetchCurriculum,
+  apiFetchStudentState,
+  apiJoinStudent,
+} from './utils/apiClient';
 import type {
   BadgeDefinition,
   Chapter,
@@ -38,14 +43,12 @@ export default function App() {
 
   const loadCurriculum = useCallback(async () => {
     try {
-      const resp = await fetch('/api/curriculum');
-      if (!resp.ok) return;
-      const data = await resp.json();
+      const data = await apiFetchCurriculum();
       if (Array.isArray(data.chapters)) setChapters(data.chapters);
       if (Array.isArray(data.badges)) setBadges(data.badges);
       if (data.tutorConfig) setTutorConfig(data.tutorConfig);
     } catch {
-      // Keep bundled curriculum fallback if offline
+      // Keep bundled curriculum fallback
     }
   }, []);
 
@@ -60,44 +63,35 @@ export default function App() {
 
     const savedId = localStorage.getItem(STORAGE_STUDENT_ID_KEY);
     if (savedId) {
-      fetch(`/api/student/state?studentId=${encodeURIComponent(savedId)}`)
-        .then(async (resp) => {
-          if (!resp.ok) {
+      apiFetchStudentState(savedId)
+        .then((data) => {
+          if (!data?.student) {
             localStorage.removeItem(STORAGE_STUDENT_ID_KEY);
             return;
           }
-          const data = await resp.json();
-          if (data.student) {
-            setStudent(data.student);
-            setClassRoom(data.classRoom);
-            setSession(data.session);
-            setSubmissions(data.submissions || []);
-            setHintsHistory(data.hints || []);
-          }
+          setStudent(data.student);
+          setClassRoom(data.classRoom);
+          setSession(data.session);
+          setSubmissions(data.submissions || []);
+          setHintsHistory(data.hints || []);
         })
         .catch(() => {
-          // Ignore transient network errors
+          // Ignore transient errors
         })
         .finally(() => setRestoring(false));
       return;
     }
 
     if (params.get('autostart') === '1') {
-      fetch('/api/student/join', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: 'Élève Démo', code: 'ALGO3SC' }),
-      })
-        .then(async (resp) => {
-          if (!resp.ok) return;
-          const data = await resp.json();
-          if (data.student) {
-            localStorage.setItem(STORAGE_STUDENT_ID_KEY, data.student.id);
-            setStudent(data.student);
-            setClassRoom(data.classRoom);
-            setSession(data.session);
-            setSubmissions(data.submissions || []);
-          }
+      apiJoinStudent('Élève Démo', 'ALGO3SC')
+        .then((res) => {
+          if (!res.ok) return;
+          const data = res.data;
+          localStorage.setItem(STORAGE_STUDENT_ID_KEY, data.student.id);
+          setStudent(data.student);
+          setClassRoom(data.classRoom);
+          setSession(data.session);
+          setSubmissions(data.submissions || []);
         })
         .finally(() => setRestoring(false));
       return;
